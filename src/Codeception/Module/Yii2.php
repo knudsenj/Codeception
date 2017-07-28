@@ -223,6 +223,11 @@ class Yii2 extends Framework implements ActiveRecord, PartedModule
         $_COOKIE = [];
         $_REQUEST = [];
 
+        if ($this->config['transaction'] && $this->transaction) {
+            $this->transaction->rollBack();
+            $this->debugSection('Database', 'Transaction cancelled; all changes reverted.');
+        }
+
         if ($this->config['cleanup']) {
             foreach ($this->loadedFixtures as $fixture) {
                 $fixture->unloadFixtures();
@@ -230,11 +235,6 @@ class Yii2 extends Framework implements ActiveRecord, PartedModule
             $this->loadedFixtures = [];
         }
       
-        if ($this->config['transaction'] && $this->transaction) {
-            $this->transaction->rollBack();
-            $this->debugSection('Database', 'Transaction cancelled; all changes reverted.');
-        }
-
         if ($this->client) {
             $this->client->resetPersistentVars();
         }
